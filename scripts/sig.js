@@ -12,6 +12,7 @@ async function main() {
 
   const Test = await hre.ethers.getContractFactory("Test");
   const test = await Test.deploy(signature);
+  await test.waitForDeployment();
 
   console.log("address0: ", await signer0.getAddress());
 }

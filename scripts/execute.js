@@ -6,7 +6,7 @@ const EP_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const PM_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 
 async function main() {
-  const [signer0] = await hre.ethers.getSigners();
+  const [signer0, signer1] = await hre.ethers.getSigners();
   const EntryPoint = await hre.ethers.getContractAt("EntryPoint", EP_ADDRESS);
   const AccountFactory = await hre.ethers.getContractAt(
     "AccountFactory",
@@ -22,7 +22,7 @@ async function main() {
   });
 
   const address0 = await signer0.getAddress();
-  console.log({sender});
+  console.log({ sender });
 
   // const initCode =
   //   FACTORY_ADDRESS +
@@ -36,14 +36,17 @@ async function main() {
     nonce: await EntryPoint.getNonce(sender, 0),
     initCode,
     callData: Account.interface.encodeFunctionData("execute"),
-    callGasLimit: 200000,
-    verificationGasLimit: 200000,
-    preVerificationGas: 50000,
+    callGasLimit: 400000,
+    verificationGasLimit: 400000,
+    preVerificationGas: 100000,
     maxFeePerGas: hre.ethers.parseUnits("10", "gwei"),
     maxPriorityFeePerGas: hre.ethers.parseUnits("5", "gwei"),
     paymasterAndData: PM_ADDRESS,
     signature: "0x",
   };
+
+  const userOpHash = await EntryPoint.getUserOpHash(userOp);
+  userOp.signature = signer0.signMessage(hre.ethers.getBytes(userOpHash));
 
   // await EntryPoint.depositTo(PM_ADDRESS, {
   //   value: hre.ethers.parseEther("100"),

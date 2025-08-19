@@ -14,11 +14,12 @@ contract Account is IAccount {
     }
 
     function validateUserOp(
-        UserOperation calldata,
-        bytes32,
+        UserOperation calldata userOp,
+        bytes32 userOpHash,
         uint256
-    ) external pure returns (uint256 validationData) {
-        return 0;
+    ) external view returns (uint256 validationData) {
+        address recovered = ECDSA.recover(ECDSA.toEthSignedMessageHash(userOpHash),userOp.signature);
+        return owner == recovered ? 0 : 1;
     }
 
     function execute() external {
